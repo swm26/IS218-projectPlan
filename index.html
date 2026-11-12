@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Research notes: building a study session tracker | IS218</title>
+<meta name="description" content="Programming and AI research behind my IS218 study session tracker.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav aria-label="Sections">
+  <a href="#question">Question</a>
+  <a href="#sources">Sources</a>
+  <a href="#findings">Findings</a>
+  <a href="#compare">Comparison</a>
+  <a href="#decision">Decision</a>
+  <a href="#ai">AI use</a>
+  <a href="#checks">Checks</a>
+  <a href="#links">Links</a>
+</nav>
+
+<header>
+  <h1>Study session tracker: research notes</h1>
+  <p class="lede">By <span class="todo">YOUR NAME</span>, IS218 Fall 2026, NJIT. These notes record what I read, what I concluded, and what I still have to prove before I build.</p>
+  <p>Fill in every highlighted <span class="todo">placeholder</span> before you submit, then delete this sentence.</p>
+</header>
+
+<main>
+
+<h2 id="question">Question and audience</h2>
+<div class="question">Which web stack lets me deliver a complete account journey (sign up, log a study session, see a private dashboard, change my account) with the least security risk, and how will I test it?</div>
+<p><strong>Audience:</strong> my instructor and classmates reviewing the Plan, and me when I start building. They should come away knowing why I picked this stack, what I verified, and what I'm still assuming.</p>
+<p><strong>The app:</strong> a signed-in user logs study sessions (subject, minutes, optional focus rating), and a private dashboard shows weekly totals, time per subject and recent sessions. A new user sees a friendly empty state.</p>
+
+<h2 id="sources">Original sources</h2>
+<p>Dates are when I actually opened and read the page. Leave the date blank until you have.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Source</th><th>What I used it for</th><th>Date checked</th></tr></thead>
+  <tbody>
+    <tr><td><a href="https://docs.djangoproject.com/en/stable/topics/auth/default/">Django docs: using the auth system</a></td><td>Sign-in, sessions, password change, password hashing</td><td><span class="todo">YYYY-MM-DD</span></td></tr>
+    <tr><td><a href="https://docs.djangoproject.com/en/stable/topics/testing/overview/">Django docs: testing</a></td><td>Unit and database tests</td><td><span class="todo">YYYY-MM-DD</span></td></tr>
+    <tr><td><a href="https://flask-login.readthedocs.io/">Flask-Login docs</a></td><td>Comparison option</td><td><span class="todo">YYYY-MM-DD</span></td></tr>
+    <tr><td><a href="https://authjs.dev/">Auth.js docs</a></td><td>Comparison option</td><td><span class="todo">YYYY-MM-DD</span></td></tr>
+    <tr><td><a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html">OWASP Password Storage Cheat Sheet</a></td><td>What safe password storage looks like</td><td><span class="todo">YYYY-MM-DD</span></td></tr>
+    <tr><td><a href="https://playwright.dev/python/docs/intro">Playwright for Python docs</a></td><td>Browser tests of the full journey</td><td><span class="todo">YYYY-MM-DD</span></td></tr>
+    <tr><td><a href="https://docs.github.com/en/pages">GitHub Pages docs</a></td><td>Publishing this site</td><td><span class="todo">YYYY-MM-DD</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="findings">Findings, kept separate</h2>
+
+<h3>Facts (each needs a source I have read)</h3>
+<div class="claim fact"><b>Fact</b>Django includes an authentication system covering users, sessions and password handling. Source: Django auth docs. <span class="todo">Quote the exact page section you confirmed.</span></div>
+<div class="claim fact"><b>Fact</b>Django stores passwords as salted hashes, not plain text. Source: Django auth docs and OWASP. <span class="todo">Confirm and note the default hasher.</span></div>
+<div class="claim fact"><b>Fact</b>Django ships a view for changing passwords and a helper that keeps the user signed in after the change. Source: Django auth docs. <span class="todo">Confirm the names (PasswordChangeView, update_session_auth_hash).</span></div>
+
+<h3>Interpretations (my reading of the facts)</h3>
+<div class="claim interp"><b>Interpretation</b>Because Django supplies sign-in, hashing and password change, I write less security-critical code myself, which lowers risk for a first account system.</div>
+<div class="claim interp"><b>Interpretation</b>Keeping the stats math in plain functions, separate from views, makes independent tests easier to write.</div>
+
+<h3>Assumptions (not yet checked)</h3>
+<div class="claim assume"><b>Assumption</b>SQLite is enough for this project's size, and I can move to Postgres later with little change.</div>
+<div class="claim assume"><b>Assumption</b>I can learn Django's structure fast enough to finish the first slice by Review 2.</div>
+<div class="claim assume"><b>Assumption</b>An AI-generated weekly summary can be added without making the core journey depend on it.</div>
+
+<h2 id="compare">Comparing approaches</h2>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Criterion</th><th>Django</th><th>Flask + Flask-Login</th><th>Next.js + Auth.js</th></tr></thead>
+  <tbody>
+    <tr><td>Account features out of the box</td><td>Most of them</td><td>Sessions only; I wire up the rest</td><td>Sign-in flows; I add the rest</td></tr>
+    <tr><td>Language I already know</td><td><span class="todo">Fill in</span></td><td><span class="todo">Fill in</span></td><td><span class="todo">Fill in</span></td></tr>
+    <tr><td>Testing tools</td><td>Built-in runner</td><td>pytest</td><td>Jest or Playwright</td></tr>
+    <tr><td>Setup time for me</td><td><span class="todo">Estimate</span></td><td><span class="todo">Estimate</span></td><td><span class="todo">Estimate</span></td></tr>
+  </tbody>
+</table>
+</div>
+<p>I filled the first and third rows from my reading so far. <span class="todo">Check each cell against its source before submitting.</span></p>
+
+<h3>Audience and presentation approaches</h3>
+<ol>
+  <li><strong>Plain dashboard:</strong> tables and totals, quick to build and easy to test.</li>
+  <li><strong>Visual dashboard:</strong> charts of weekly minutes and subjects, more engaging but more to test.</li>
+</ol>
+<p>Chosen: <span class="todo">pick one and give a one-sentence reason</span>.</p>
+
+<h2 id="decision">Decision and what it feeds</h2>
+<p><strong>Stack:</strong> Python, Django, SQLite, Django templates, Playwright for browser tests, GitHub Actions for CI. <span class="todo">Change this if your own comparison points elsewhere.</span></p>
+
+<h3>Five stories</h3>
+<ol>
+  <li>As a visitor, I can sign up and see clear errors when my input is invalid.</li>
+  <li>As a user, I can sign in and out.</li>
+  <li>As a user, I can log a study session with validated subject and minutes.</li>
+  <li>As a user, I can see only my own totals and recent sessions, with an empty state when I have none.</li>
+  <li>As a user, I can change my display name and my password using my current password.</li>
+</ol>
+
+<h3>Design decision to test</h3>
+<p>Compare computing stats with a simple function against a Strategy pattern for different summaries (weekly, by subject). I will keep whichever is easier to read and test, and record why.</p>
+
+<h3>Planned experiment</h3>
+<p><span class="todo">Pick one: study timer, AI weekly summary or streaks.</span> Stopping point: <span class="todo">e.g. end of week 3</span>. Fallback: the manual log form, which stays fully working.</p>
+
+<h3>Rough data sketch</h3>
+<ul>
+  <li><strong>User:</strong> email, display name, password hash</li>
+  <li><strong>StudySession:</strong> user, subject, minutes (1 to 600), focus rating (optional), notes, created time</li>
+  <li>Every query filters by the signed-in user.</li>
+</ul>
+
+<h2 id="ai">AI assistance and verification</h2>
+<p>I used <span class="todo">name the tool(s)</span> to brainstorm the app idea, draft the stack comparison, and draft the structure of this site. I did not treat its statements as sources. Each claim below is checked against an original source.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>AI claim</th><th>How I verify</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Django handles password hashing and change</td><td>Read the Django auth docs</td><td class="status planned">Planned</td></tr>
+    <tr><td>Flask needs more manual account wiring</td><td>Read Flask-Login docs</td><td class="status planned">Planned</td></tr>
+    <tr><td>SQLite is fine for a small tracker</td><td>Check SQLite's own guidance, then test</td><td class="status planned">Planned</td></tr>
+  </tbody>
+</table>
+</div>
+<p><strong>Expectation:</strong> AI saves me setup time. <strong>Result:</strong> <span class="todo">fill in as you go</span>. <strong>Next time:</strong> <span class="todo">fill in</span>.</p>
+
+<h2 id="checks">Checks</h2>
+<p>Every check carries one label: <em>planned</em> (not run), <em>attempted</em> (run, unclear or failed), or <em>observed</em> (run, result recorded). Change a label only after you run it.</p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Check</th><th>Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td>Create a Django project and run it locally</td><td class="status planned">Planned</td><td>Screenshot or terminal output</td></tr>
+    <tr><td>Sign up, sign in, sign out in a browser</td><td class="status planned">Planned</td><td>Test result</td></tr>
+    <tr><td>Stats function returns correct totals for known inputs</td><td class="status planned">Planned</td><td>Test result</td></tr>
+    <tr><td>User A cannot see user B's sessions</td><td class="status planned">Planned</td><td>Test result</td></tr>
+    <tr><td>Session still valid after password change</td><td class="status planned">Planned</td><td>Test result</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2 id="links">Links</h2>
+<ul>
+  <li><a href="https://github.com/YOUR-USERNAME/YOUR-REPO">Project repository</a> <span class="todo">replace URL</span></li>
+  <li><a href="https://YOUR-CAREER-SITE-URL">My career research site</a> <span class="todo">replace URL (due at Portfolio Plan)</span></li>
+  <li><a href="https://keithwilliams.org/is218-studio/projects/individual.html">Assignment brief</a></li>
+</ul>
+
+</main>
+
+<footer>
+  <p>IS218 Fall 2026, NJIT. Last updated <span class="todo">YYYY-MM-DD</span>. Official deadlines and submissions are in Canvas.</p>
+</footer>
+
+</body>
+</html>
